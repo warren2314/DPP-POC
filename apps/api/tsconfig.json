@@ -6,12 +6,12 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "rootDir": "./src",
     "outDir": "./dist",
-    "incremental": true,
+    "incremental": false,
     "strictPropertyInitialization": false
   },
   "include": [
-    "src/**/*.ts",
-    "prisma/**/*.ts"
+    "src/**/*.ts"
   ]
 }

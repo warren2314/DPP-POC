@@ -1,0 +1,30 @@
+
+> @dpp/web@0.1.0 predev
+> npm run build:shared
+
+
+> @dpp/web@0.1.0 build:shared
+> npm run build --prefix ../../packages/shared
+
+
+> @dpp/shared@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @dpp/web@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3003
+   - Network:      http://10.5.0.2:3003
+
+ ✓ Starting...
+ ✓ Ready in 1907ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.5s (599 modules)
+ GET / 200 in 3003ms
+ ✓ Compiled /assessments/new in 287ms (617 modules)
+ GET /assessments/new 200 in 529ms
+ ✓ Compiled /templates in 222ms (622 modules)
+ GET /templates 200 in 368ms
+[?25h

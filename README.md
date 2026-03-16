@@ -21,9 +21,31 @@ Starter monorepo for an internal SAP Fioneer-style DPP assessment application th
 ## Recommended local setup
 
 1. Start PostgreSQL locally with `docker compose up -d`.
-2. Install dependencies with `pnpm install`.
-3. Run the API with `pnpm dev:api`.
-4. Run the frontend with `pnpm dev:web`.
+2. Install dependencies with `npm install`.
+3. Run the API with `npm run dev:api`.
+4. Run the frontend with `npm run dev:web`.
+
+## Windows PowerShell note
+
+If PowerShell blocks `npm.ps1` on your machine, use `npm.cmd` instead:
+
+1. `npm.cmd install`
+2. `npm.cmd run dev:api`
+3. `npm.cmd run dev:web`
+
+Useful verification commands:
+
+- `npm.cmd run build --workspace @dpp/api`
+- `npm.cmd run build --workspace @dpp/web`
+
+Open the guided assessment at `http://localhost:3000/assessments/new`.
+
+## Current prototype behavior
+
+- The assessment wizard now keeps local answer state, so `Yes` / `No` / `Unsure` selections are clickable.
+- Completion starts at `0%` and updates from actual answers instead of a hard-coded placeholder.
+- Jira and evidence panels default to neutral local-prototype values rather than fake linked records.
+- The frontend is still in local-state mode; it is not yet wired to persist answers through the API.
 
 ## Assumptions
 

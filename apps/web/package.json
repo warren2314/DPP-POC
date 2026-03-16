@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build:shared": "npm run build --prefix ../../packages/shared",
+    "predev": "npm run build:shared",
+    "prebuild": "npm run build:shared",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@dpp/shared": "workspace:*",
+    "@dpp/shared": "file:../../packages/shared",
     "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

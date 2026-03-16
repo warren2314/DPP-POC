@@ -1,79 +1,144 @@
 import Link from "next/link";
-import { sampleAssessment } from "../lib/mock-data";
+import { AppShell } from "./app-shell";
+import { localDemoMetadata, sampleTemplate } from "../lib/mock-data";
 
 export function DashboardShell() {
   return (
-    <main className="page-shell">
+    <AppShell
+      eyebrow="DPP Assessment Platform"
+      title="Operational workspace for guided privacy assessments"
+      subtitle="Designed to replace spreadsheet-driven ambiguity with a reviewable, markdown-governed workflow that teams can actually navigate."
+      actions={
+        <Link href="/assessments/new" className="primary-button">
+          Start assessment
+        </Link>
+      }
+    >
       <section className="hero-panel">
-        <div>
-          <p className="eyebrow">SAP Fioneer Internal Workflow</p>
-          <h1>Markdown-driven DPP assessments with evidence, review, and traceability.</h1>
+        <div className="hero-copy-block">
+          <div className="eyebrow-row">
+            <span className="tag strong">Template {sampleTemplate.version}</span>
+            <span className="tag soft">{localDemoMetadata.environment}</span>
+          </div>
+          <h2 className="hero-title">Assessment work should feel like a governed operating model, not a spreadsheet with legal language.</h2>
           <p className="hero-copy">
-            Replace the spreadsheet with a governed assessment workflow that preserves template versions, guides
-            requestors clearly, and surfaces reviewer decisions without treating compliance as a black box.
+            This product is structured around three things: the published markdown template, guided user interpretation,
+            and traceable reviewer judgement. That should be immediately visible in the UI.
           </p>
+          <div className="hero-actions">
+            <Link href="/assessments/new" className="primary-button">
+              Open guided flow
+            </Link>
+            <Link href="/templates" className="secondary-button">
+              Review template governance
+            </Link>
+          </div>
         </div>
-        <div className="hero-metrics">
-          <div className="metric-card">
-            <span>Active template</span>
-            <strong>{sampleAssessment.templateVersion}</strong>
+
+        <div className="hero-stack">
+          <div className="metric-card emphasis">
+            <span>Current operating pattern</span>
+            <strong>Markdown template to guided answers to reviewer summary</strong>
           </div>
-          <div className="metric-card">
-            <span>Current draft</span>
-            <strong>{sampleAssessment.id}</strong>
-          </div>
-          <div className="metric-card">
-            <span>Jira link</span>
-            <strong>{sampleAssessment.jiraKey}</strong>
+          <div className="metric-grid">
+            <div className="metric-card">
+              <span>Template source</span>
+              <strong>Version-pinned markdown</strong>
+            </div>
+            <div className="metric-card">
+              <span>Threat model/TAM</span>
+              <strong>Evidence in workflow</strong>
+            </div>
+            <div className="metric-card">
+              <span>Compliance output</span>
+              <strong>Explainable, not black-box</strong>
+            </div>
+            <div className="metric-card">
+              <span>Jira status</span>
+              <strong>Not linked yet</strong>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="dashboard-grid">
-        <article className="panel">
+        <article className="panel panel-tall">
           <div className="panel-head">
-            <h2>Assessment Queue</h2>
-            <Link href="/assessments/new" className="action-link">
-              Start new assessment
-            </Link>
-          </div>
-          <div className="assessment-row">
             <div>
-              <strong>{sampleAssessment.productName}</strong>
-              <p>{sampleAssessment.jurisdictions.join(", ")} | Template {sampleAssessment.templateVersion}</p>
+              <p className="section-kicker">Assessment operations</p>
+              <h2>Current workspace state</h2>
             </div>
-            <div className="assessment-meta">
-              <span>{sampleAssessment.completionPercent}% complete</span>
-              <Link href="/assessments/ASM-2026-001">Open</Link>
+          </div>
+          <div className="list-board">
+            <div className="board-row">
+              <div>
+                <strong>Saved assessments</strong>
+                <p>No persisted assessments are loaded into the dashboard yet.</p>
+              </div>
+              <span className="status-pill neutral">Prototype mode</span>
+            </div>
+            <div className="board-row">
+              <div>
+                <strong>Guidance system</strong>
+                <p>Questions show plain-English help, examples, and rationale in context.</p>
+              </div>
+              <span className="status-pill good">Available</span>
+            </div>
+            <div className="board-row">
+              <div>
+                <strong>Backend persistence</strong>
+                <p>The live API exists, but the frontend is not yet posting assessments end to end.</p>
+              </div>
+              <span className="status-pill warning">Next build step</span>
             </div>
           </div>
         </article>
 
         <article className="panel">
           <div className="panel-head">
-            <h2>Reviewer Attention</h2>
+            <div>
+              <p className="section-kicker">Reviewer lens</p>
+              <h2>What should stand out</h2>
+            </div>
           </div>
-          <ul className="signal-list">
-            <li>2 questions still need clarification from the requestor.</li>
-            <li>Threat model reference is missing for one in-scope data flow.</li>
-            <li>Automated decision safeguards still require reviewer judgement.</li>
+          <ul className="signal-list dense">
+            <li>Users should know what a question means before they answer it.</li>
+            <li>Evidence requests should appear when the architecture implies they matter.</li>
+            <li>Jurisdiction outcomes should point to requirements and unanswered gaps.</li>
+            <li>Historic assessments must remain tied to the exact template version used.</li>
           </ul>
         </article>
 
         <article className="panel">
           <div className="panel-head">
-            <h2>Template Governance</h2>
+            <div>
+              <p className="section-kicker">Template governance</p>
+              <h2>Source of truth posture</h2>
+            </div>
             <Link href="/templates" className="action-link">
-              Manage templates
+              Open template registry
             </Link>
           </div>
-          <ul className="signal-list">
-            <li>Current template source remains markdown-first and version-pinned.</li>
-            <li>Historic assessments remain attached to the exact parsed snapshot used.</li>
-            <li>Validation warnings highlight questions missing examples or guidance.</li>
-          </ul>
+          <div className="governance-grid">
+            <div className="governance-card">
+              <span>Template key</span>
+              <strong>{sampleTemplate.templateKey}</strong>
+            </div>
+            <div className="governance-card">
+              <span>Jurisdictions</span>
+              <strong>{sampleTemplate.jurisdictions.join(", ")}</strong>
+            </div>
+            <div className="governance-card">
+              <span>Question source</span>
+              <strong>Published markdown</strong>
+            </div>
+            <div className="governance-card">
+              <span>Version behavior</span>
+              <strong>Immutable snapshots</strong>
+            </div>
+          </div>
         </article>
       </section>
-    </main>
+    </AppShell>
   );
 }

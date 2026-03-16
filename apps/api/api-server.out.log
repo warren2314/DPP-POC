@@ -1,0 +1,24 @@
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +44ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mTemplateModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mComplianceModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAssessmentModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mReportModule dependencies initialized[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mJiraModule dependencies initialized[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mTemplateController {/api/templates}:[39m[38;5;3m +3ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/templates, GET} route[39m[38;5;3m +4ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/templates/:templateKey/versions, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/templates/validate, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/templates, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mAssessmentController {/api/assessments}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId, GET} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId/answers/:questionKey, PUT} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId/submit, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mComplianceController {/api/assessments/:assessmentId/compliance-summary}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId/compliance-summary, GET} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mReportController {/api/assessments/:assessmentId/report}:[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId/report, POST} route[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mJiraController {/api/assessments/:assessmentId/jira-links}:[39m[38;5;3m +1ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/assessments/:assessmentId/jira-links, POST} route[39m[38;5;3m +0ms[39m
+[32m[Nest] 123540  - [39m16/03/2026, 15:37:03 [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +2ms[39m

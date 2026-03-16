@@ -205,7 +205,7 @@ export class MarkdownTemplateParserService {
     }
 
     if (Array.isArray(node.children)) {
-      return node.children.map((child) => this.flattenText(child)).join("").trim();
+      return node.children.map((child: any) => this.flattenText(child)).join("").trim();
     }
 
     return "";

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { PrismaClient, TemplateStatus } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { createHash } from "node:crypto";
 
 const prisma = new PrismaClient();
@@ -24,12 +24,12 @@ async function main() {
 
   const template = await prisma.assessmentTemplate.upsert({
     where: { templateKey: "dpp_privacy_checklist" },
-    update: { status: TemplateStatus.active },
+    update: { status: "active" },
     create: {
       templateKey: "dpp_privacy_checklist",
       name: "Privacy & Data Protection Compliance Checklist",
       owningTeam: "DPP",
-      status: TemplateStatus.active
+      status: "active"
     }
   });
 
@@ -48,7 +48,7 @@ async function main() {
       templateId: template.id,
       version: "1.0.0",
       title: "Privacy & Data Protection Compliance Checklist",
-      status: TemplateStatus.active,
+      status: "active",
       sourceType: "governed",
       sourceMarkdown: markdown,
       sourceChecksum: checksum,

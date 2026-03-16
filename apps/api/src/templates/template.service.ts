@@ -17,6 +17,8 @@ interface StoredTemplateVersion {
 @Injectable()
 export class TemplateService {
   private readonly templates = new Map<string, StoredTemplateVersion[]>();
+  private static readonly OFFICIAL_TEMPLATE_KEY = "dpp_privacy_checklist_full";
+  private static readonly ENRICHED_TEMPLATE_KEY = "dpp_privacy_checklist";
 
   constructor(
     private readonly parser: MarkdownTemplateParserService,
@@ -94,6 +96,41 @@ export class TemplateService {
   }
 
   private bootstrapSampleTemplate() {
+    this.bootstrapOfficialLegacyTemplate();
+    this.bootstrapEnrichedPrototypeTemplate();
+  }
+
+  private checksum(markdown: string) {
+    return createHash("sha256").update(markdown).digest("hex");
+  }
+
+  private bootstrapOfficialLegacyTemplate() {
+    const candidatePaths = [
+      join(process.cwd(), "privacy_compliance_checklist.md"),
+      join(process.cwd(), "..", "..", "privacy_compliance_checklist.md")
+    ];
+
+    for (const candidate of candidatePaths) {
+      try {
+        const markdown = readFileSync(candidate, "utf8");
+        this.uploadTemplate(
+          "privacy_compliance_checklist.md",
+          this.wrapLegacyMarkdown({
+            templateKey: TemplateService.OFFICIAL_TEMPLATE_KEY,
+            version: "1.0.0",
+            title: "Privacy & Data Protection Compliance Checklist",
+            derivedFrom: "privacy_compliance_checklist.md",
+            markdown
+          })
+        );
+        return;
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  private bootstrapEnrichedPrototypeTemplate() {
     const candidatePaths = [
       join(process.cwd(), "templates", "privacy_compliance_checklist.enriched.v1.md"),
       join(process.cwd(), "..", "..", "templates", "privacy_compliance_checklist.enriched.v1.md")
@@ -110,7 +147,33 @@ export class TemplateService {
     }
   }
 
-  private checksum(markdown: string) {
-    return createHash("sha256").update(markdown).digest("hex");
+  private wrapLegacyMarkdown(input: {
+    templateKey: string;
+    version: string;
+    title: string;
+    derivedFrom: string;
+    markdown: string;
+  }) {
+    return `---
+template_key: ${input.templateKey}
+version: ${input.version}
+title: ${input.title}
+status: active
+source_type: legacy
+derived_from: ${input.derivedFrom}
+jurisdictions:
+  - code: EU_GDPR
+    label: EU GDPR
+  - code: UK_GDPR
+    label: UK GDPR
+owners:
+  - privacy-office
+review_roles:
+  - requestor
+  - privacy_assessor
+  - security_architect
+---
+
+${input.markdown}`;
   }
 }

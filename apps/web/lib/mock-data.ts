@@ -101,14 +101,8 @@ export const sampleTemplate: ParsedTemplate = {
   ]
 };
 
-export const sampleAssessment = {
-  id: "ASM-2026-001",
-  productName: "Collections Portal",
-  owner: "alice.smith@example.com",
-  jurisdictions: ["EU_GDPR", "UK_GDPR"],
-  status: "Draft",
-  templateVersion: "1.0.0",
-  completionPercent: 68,
-  unresolvedComments: 2,
-  jiraKey: "DPP-431"
+export const localDemoMetadata = {
+  environment: "Local prototype",
+  defaultAssessmentId: "LOCAL-DEMO",
+  jiraKey: null
 };

@@ -1,27 +1,54 @@
-export function ComplianceSummary() {
+interface ComplianceSummaryProps {
+  answeredQuestions: number;
+  totalQuestions: number;
+  completionPercent: number;
+  jiraKey: string | null;
+}
+
+export function ComplianceSummary({
+  answeredQuestions,
+  totalQuestions,
+  completionPercent,
+  jiraKey
+}: ComplianceSummaryProps) {
+  const unansweredRequired = totalQuestions - answeredQuestions;
+
   return (
     <section className="panel">
       <div className="panel-head">
-        <h2>Explainable coverage summary</h2>
+        <div>
+          <p className="section-kicker">Coverage</p>
+          <h2>Explainable assessment state</h2>
+        </div>
       </div>
       <div className="summary-grid">
         <div className="summary-card">
           <span>Completion</span>
-          <strong>68%</strong>
+          <strong>{completionPercent}%</strong>
         </div>
         <div className="summary-card">
-          <span>Reviewer status</span>
-          <strong>Review required</strong>
+          <span>Answered questions</span>
+          <strong>
+            {answeredQuestions}/{totalQuestions}
+          </strong>
         </div>
         <div className="summary-card">
-          <span>Evidence gaps</span>
-          <strong>2</strong>
+          <span>Jira link</span>
+          <strong>{jiraKey ?? "Not linked"}</strong>
         </div>
       </div>
-      <ul className="signal-list">
-        <li>EU_GDPR:ART_4_PERSONAL_DATA appears covered by identified data categories.</li>
-        <li>EU_GDPR:ART_22_AUTOMATED_DECISIONS still requires clearer human-intervention evidence.</li>
-        <li>This summary is reviewer-assistive and not a final legal determination.</li>
+      <div className="status-banner">
+        <strong>Assessment posture</strong>
+        <p>
+          {unansweredRequired > 0
+            ? "Review is still premature because mandatory questions remain unanswered."
+            : "The questionnaire is complete enough for a reviewer-guided coverage summary."}
+        </p>
+      </div>
+      <ul className="signal-list dense">
+        <li>{unansweredRequired} questions remain unanswered in the local prototype.</li>
+        <li>The current frontend summary is driven by live answers rather than placeholder numbers.</li>
+        <li>Final requirement coverage should come from backend rules evaluation and reviewer judgement.</li>
       </ul>
     </section>
   );
