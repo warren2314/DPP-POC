@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TemplateStatus {
+  draft
+  active
+  retired
+}
+
+enum AssessmentStatus {
+  draft
+  in_review
+  changes_requested
+  approved
+  closed
+}
+
+enum ReviewDecision {
+  approved
+  changes_requested
+  blocked
+}
+
+enum SyncStatus {
+  pending
+  succeeded
+  failed
+}
+
+model AssessmentTemplate {
+  id             String            @id @default(cuid())
+  templateKey    String            @unique
+  name           String
+  owningTeam     String?
+  status         TemplateStatus    @default(draft)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  versions       TemplateVersion[]
+}
+
+model TemplateVersion {
+  id                String                 @id @default(cuid())
+  templateId        String
+  version           String
+  title             String
+  status            TemplateStatus         @default(draft)
+  sourceType        String
+  sourceMarkdown    String                 @db.Text
+  sourceChecksum    String
+  parsedJson        Json
+  validationJson    Json
+  publishedAt       DateTime?
+  createdAt         DateTime               @default(now())
+  template          AssessmentTemplate     @relation(fields: [templateId], references: [id])
+  markdownSource    MarkdownSource?
+  sections          TemplateSection[]
+  questions         TemplateQuestion[]
+  assessments       Assessment[]
+
+  @@unique([templateId, version])
+}
+
+model MarkdownSource {
+  id                String          @id @default(cuid())
+  templateVersionId String          @unique
+  filename          String
+  contentType       String
+  storagePath       String?
+  checksum          String
+  createdAt         DateTime        @default(now())
+  templateVersion   TemplateVersion @relation(fields: [templateVersionId], references: [id])
+}
+
+model TemplateSection {
+  id                String             @id @default(cuid())
+  templateVersionId String
+  key               String
+  title             String
+  description       String?
+  helpSummary       String?
+  orderIndex        Int
+  mapsTo            Json?
+  templateVersion   TemplateVersion    @relation(fields: [templateVersionId], references: [id])
+  questions         TemplateQuestion[]
+
+  @@unique([templateVersionId, key])
+}
+
+model TemplateQuestion {
+  id                String             @id @default(cuid())
+  templateVersionId String
+  sectionId         String
+  stableKey         String
+  prompt            String
+  responseType      String
+  required          Boolean            @default(true)
+  jurisdictions     Json?
+  whyItMatters      String?            @db.Text
+  guidanceJson      Json?
+  examplesJson      Json?
+  evidenceJson      Json?
+  requirementRefs   Json?
+  optionsJson       Json?
+  displayRulesJson  Json?
+  validationJson    Json?
+  consistencyJson   Json?
+  orderIndex        Int
+  templateVersion   TemplateVersion    @relation(fields: [templateVersionId], references: [id])
+  section           TemplateSection    @relation(fields: [sectionId], references: [id])
+  answers           AssessmentAnswer[]
+  comments          ReviewerComment[]
+
+  @@unique([templateVersionId, stableKey])
+}
+
+model Jurisdiction {
+  id            String           @id @default(cuid())
+  code          String           @unique
+  label         String
+  status        String
+  requirements  DppRequirement[]
+}
+
+model DppRequirement {
+  id              String        @id @default(cuid())
+  jurisdictionId  String
+  code            String
+  title           String
+  description     String?       @db.Text
+  jurisdiction    Jurisdiction  @relation(fields: [jurisdictionId], references: [id])
+
+  @@unique([jurisdictionId, code])
+}
+
+model User {
+  id              String             @id @default(cuid())
+  externalAuthId  String?            @unique
+  email           String             @unique
+  displayName     String
+  status          String             @default("active")
+  comments        ReviewerComment[]
+  reviews         ReviewApproval[]
+}
+
+model Assessment {
+  id                String               @id @default(cuid())
+  templateVersionId String
+  productName       String
+  jurisdictions     Json
+  status            AssessmentStatus     @default(draft)
+  jiraKey           String?
+  summary           String?              @db.Text
+  createdBy         String
+  submittedAt       DateTime?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  templateVersion   TemplateVersion      @relation(fields: [templateVersionId], references: [id])
+  answers           AssessmentAnswer[]
+  comments          ReviewerComment[]
+  evidenceItems     AssessmentEvidence[]
+  reports           Report[]
+  jiraLinks         JiraLink[]
+  approvals         ReviewApproval[]
+  auditEvents       AuditEvent[]
+}
+
+model AssessmentAnswer {
+  id                String             @id @default(cuid())
+  assessmentId      String
+  questionId        String
+  valueJson         Json?
+  status            String             @default("answered")
+  confidence        String?
+  comment           String?            @db.Text
+  evidenceRefsJson  Json?
+  updatedBy         String
+  updatedAt         DateTime           @updatedAt
+  assessment        Assessment         @relation(fields: [assessmentId], references: [id])
+  question          TemplateQuestion   @relation(fields: [questionId], references: [id])
+
+  @@unique([assessmentId, questionId])
+}
+
+model AssessmentEvidence {
+  id                String        @id @default(cuid())
+  assessmentId      String
+  type              String
+  uri               String?
+  fileName          String?
+  versionLabel      String?
+  reviewedAt        DateTime?
+  metadataJson      Json?
+  assessment        Assessment    @relation(fields: [assessmentId], references: [id])
+}
+
+model ReviewerComment {
+  id                String             @id @default(cuid())
+  assessmentId      String
+  questionId        String?
+  authorId          String
+  body              String             @db.Text
+  resolutionStatus  String             @default("open")
+  createdAt         DateTime           @default(now())
+  assessment        Assessment         @relation(fields: [assessmentId], references: [id])
+  question          TemplateQuestion?  @relation(fields: [questionId], references: [id])
+  author            User               @relation(fields: [authorId], references: [id])
+}
+
+model ReviewApproval {
+  id                String            @id @default(cuid())
+  assessmentId      String
+  reviewerId        String
+  decision          ReviewDecision
+  notes             String?           @db.Text
+  decidedAt         DateTime?
+  assessment        Assessment        @relation(fields: [assessmentId], references: [id])
+  reviewer          User              @relation(fields: [reviewerId], references: [id])
+}
+
+model Report {
+  id                String        @id @default(cuid())
+  assessmentId      String
+  version           Int           @default(1)
+  htmlPath          String?
+  pdfPath           String?
+  generatedAt       DateTime      @default(now())
+  reportJson        Json
+  assessment        Assessment    @relation(fields: [assessmentId], references: [id])
+}
+
+model JiraLink {
+  id                String        @id @default(cuid())
+  assessmentId      String
+  jiraKey           String
+  jiraUrl           String
+  syncMode          String
+  lastSyncAt        DateTime?
+  status            SyncStatus    @default(pending)
+  metadataJson      Json?
+  assessment        Assessment    @relation(fields: [assessmentId], references: [id])
+
+  @@unique([assessmentId, jiraKey])
+}
+
+model AuditEvent {
+  id                String        @id @default(cuid())
+  assessmentId      String
+  actor             String
+  eventType         String
+  detailsJson       Json?
+  createdAt         DateTime      @default(now())
+  assessment        Assessment    @relation(fields: [assessmentId], references: [id])
+}

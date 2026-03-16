@@ -1,0 +1,79 @@
+{
+  "templateKey": "dpp_privacy_checklist",
+  "version": "1.0.0",
+  "title": "Privacy & Data Protection Compliance Checklist",
+  "status": "active",
+  "jurisdictions": [
+    "EU_GDPR",
+    "UK_GDPR"
+  ],
+  "sections": [
+    {
+      "key": "direct_identifiers",
+      "title": "Personal Data Processing - Direct Identifiers",
+      "order": 1,
+      "description": "Detect whether direct identifiers are processed anywhere in the solution lifecycle.",
+      "questions": [
+        {
+          "stableKey": "PDP_DI_001",
+          "prompt": "Does your product process names of natural persons?",
+          "responseType": "boolean",
+          "required": true,
+          "jurisdictions": [
+            "EU_GDPR",
+            "UK_GDPR"
+          ],
+          "whyItMatters": "Names are direct personal identifiers and usually make personal-data handling obligations applicable.",
+          "guidance": {
+            "plainEnglish": "Answer yes if legal names, display names, or contact names are stored, transmitted, exported, or logged."
+          },
+          "examples": {
+            "good": [
+              "Customer onboarding stores account holder first and last name in the policy record."
+            ],
+            "bad": [
+              "Users exist in the product."
+            ]
+          },
+          "evidence": {
+            "recommended": [
+              "tam_diagram",
+              "data_inventory"
+            ]
+          },
+          "requirementRefs": [
+            "EU_GDPR:ART_4_PERSONAL_DATA",
+            "UK_GDPR:ART_4_PERSONAL_DATA"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "threat_and_architecture_evidence",
+      "title": "Threat Modelling & TAM Evidence",
+      "order": 4,
+      "description": "Ensure architecture evidence exists and is aligned with assessment answers.",
+      "questions": [
+        {
+          "stableKey": "EVID_TM_001",
+          "prompt": "Has a threat model been created or linked for the in-scope architecture?",
+          "responseType": "single_select",
+          "required": true,
+          "options": [
+            "linked",
+            "uploaded",
+            "not_available"
+          ],
+          "displayRules": {
+            "all": [
+              {
+                "fact": "personal_data_present",
+                "equals": true
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
