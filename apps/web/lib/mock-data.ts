@@ -1,5 +1,14 @@
 import { ParsedTemplate } from "@dpp/shared";
 
+export interface LocalAssessmentMetadata {
+  environment: string;
+  defaultAssessmentId: string;
+  projectName: string;
+  jiraKey: string;
+  threatModelUrl: string;
+  tamDiagramUrl: string;
+}
+
 export const sampleTemplate: ParsedTemplate = {
   templateKey: "dpp_privacy_checklist",
   version: "1.0.0",
@@ -104,5 +113,8 @@ export const sampleTemplate: ParsedTemplate = {
 export const localDemoMetadata = {
   environment: "Local prototype",
   defaultAssessmentId: "LOCAL-DEMO",
-  jiraKey: null
-};
+  projectName: "",
+  jiraKey: "",
+  threatModelUrl: "",
+  tamDiagramUrl: ""
+} satisfies LocalAssessmentMetadata;

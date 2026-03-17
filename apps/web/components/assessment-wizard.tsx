@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import type { ParsedTemplate } from "@dpp/shared";
 import { AppShell } from "./app-shell";
-import { localDemoMetadata, sampleTemplate } from "../lib/mock-data";
+import { localDemoMetadata, sampleTemplate, type LocalAssessmentMetadata } from "../lib/mock-data";
 import { fetchLatestTemplate, OFFICIAL_TEMPLATE_KEY } from "../lib/template-client";
 import { QuestionCard } from "./question-card";
 import { HelpDrawer } from "./help-drawer";
 import { EvidencePanel } from "./evidence-panel";
 import { ComplianceSummary } from "./compliance-summary";
+import { AssessmentMetadataPanel, type EditableAssessmentMetadataField } from "./assessment-metadata-panel";
 
 export function AssessmentWizard() {
   const [template, setTemplate] = useState<ParsedTemplate | null>(null);
@@ -17,6 +18,7 @@ export function AssessmentWizard() {
   const [templateError, setTemplateError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean | string | null>>({});
+  const [metadata, setMetadata] = useState<LocalAssessmentMetadata>(localDemoMetadata);
 
   useEffect(() => {
     let isMounted = true;
@@ -53,6 +55,7 @@ export function AssessmentWizard() {
 
   const activeTemplate = template ?? sampleTemplate;
   const storageKey = `dpp-local-assessment-${activeTemplate.templateKey}-${activeTemplate.version}`;
+  const metadataStorageKey = `${storageKey}-metadata`;
   const flatQuestions = activeTemplate.sections.flatMap((section, sectionIndex) =>
     section.questions.map((question, questionIndex) => ({
       ...question,
@@ -88,6 +91,30 @@ export function AssessmentWizard() {
     window.localStorage.setItem(storageKey, JSON.stringify(answers));
   }, [answers, storageKey]);
 
+  useEffect(() => {
+    const savedValue = window.localStorage.getItem(metadataStorageKey);
+
+    if (!savedValue) {
+      setMetadata(localDemoMetadata);
+      return;
+    }
+
+    try {
+      const parsedValue = JSON.parse(savedValue) as Partial<LocalAssessmentMetadata>;
+      setMetadata({
+        ...localDemoMetadata,
+        ...parsedValue
+      });
+    } catch {
+      window.localStorage.removeItem(metadataStorageKey);
+      setMetadata(localDemoMetadata);
+    }
+  }, [metadataStorageKey]);
+
+  useEffect(() => {
+    window.localStorage.setItem(metadataStorageKey, JSON.stringify(metadata));
+  }, [metadata, metadataStorageKey]);
+
   const updateAnswer = (value: boolean | string | null) => {
     if (!question) {
       return;
@@ -99,9 +126,18 @@ export function AssessmentWizard() {
     }));
   };
 
+  const updateMetadata = (field: EditableAssessmentMetadataField, value: string) => {
+    setMetadata((current) => ({
+      ...current,
+      [field]: value
+    }));
+  };
+
   const resetAnswers = () => {
     setAnswers({});
+    setMetadata(localDemoMetadata);
     window.localStorage.removeItem(storageKey);
+    window.localStorage.removeItem(metadataStorageKey);
     setCurrentIndex(0);
   };
 
@@ -181,8 +217,12 @@ export function AssessmentWizard() {
           <strong>{activeTemplate.version}</strong>
         </div>
         <div className="overview-card">
-          <span>Jira</span>
-          <strong>{localDemoMetadata.jiraKey ?? "Not linked"}</strong>
+          <span>Project</span>
+          <strong>{metadata.projectName.trim() || "Not named"}</strong>
+        </div>
+        <div className="overview-card">
+          <span>Jira ticket</span>
+          <strong>{metadata.jiraKey.trim() || "Not linked"}</strong>
         </div>
       </section>
 
@@ -191,6 +231,8 @@ export function AssessmentWizard() {
           <p>{templateError}</p>
         </section>
       ) : null}
+
+      <AssessmentMetadataPanel metadata={metadata} onChange={updateMetadata} />
 
       <section className="wizard-layout">
         <nav className="panel nav-panel structured">
@@ -251,7 +293,8 @@ export function AssessmentWizard() {
             answeredQuestions={answeredQuestions}
             totalQuestions={flatQuestions.length}
             completionPercent={completionPercent}
-            jiraKey={localDemoMetadata.jiraKey}
+            projectName={metadata.projectName}
+            jiraKey={metadata.jiraKey}
           />
         </div>
 
@@ -259,6 +302,8 @@ export function AssessmentWizard() {
           <HelpDrawer question={question} />
           <EvidencePanel
             evidenceLabels={[...(question.evidence?.required ?? []), ...(question.evidence?.recommended ?? [])]}
+            tamDiagramUrl={metadata.tamDiagramUrl}
+            threatModelUrl={metadata.threatModelUrl}
           />
         </div>
       </section>

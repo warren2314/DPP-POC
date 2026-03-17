@@ -247,6 +247,7 @@ ul {
 .hero-stack,
 .metric-grid,
 .governance-grid,
+.metadata-grid,
 .summary-grid,
 .wizard-main,
 .wizard-sidebar,
@@ -495,7 +496,7 @@ ul {
 
 .assessment-overview {
   display: grid;
-  grid-template-columns: 1.2fr repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.2fr repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -666,8 +667,62 @@ ul {
   gap: 8px;
 }
 
+.metadata-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metadata-field {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--bg-panel-strong);
+}
+
+.metadata-label {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.76rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-weight: 700;
+}
+
+.metadata-input {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font: inherit;
+}
+
+.metadata-input:focus {
+  outline: none;
+  border-color: rgba(15, 118, 110, 0.48);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.metadata-help {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.artifact-link {
+  width: fit-content;
+  color: var(--accent-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
 .summary-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .report-sheet {
@@ -805,6 +860,7 @@ ul {
   .hero-panel,
   .question-intro,
   .example-grid,
+  .metadata-grid,
   .summary-grid,
   .report-section.two-column,
   .assessment-overview {

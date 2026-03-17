@@ -2,13 +2,15 @@ interface ComplianceSummaryProps {
   answeredQuestions: number;
   totalQuestions: number;
   completionPercent: number;
-  jiraKey: string | null;
+  projectName: string;
+  jiraKey: string;
 }
 
 export function ComplianceSummary({
   answeredQuestions,
   totalQuestions,
   completionPercent,
+  projectName,
   jiraKey
 }: ComplianceSummaryProps) {
   const unansweredRequired = totalQuestions - answeredQuestions;
@@ -33,8 +35,12 @@ export function ComplianceSummary({
           </strong>
         </div>
         <div className="summary-card">
-          <span>Jira link</span>
-          <strong>{jiraKey ?? "Not linked"}</strong>
+          <span>Project</span>
+          <strong>{projectName.trim() || "Not named"}</strong>
+        </div>
+        <div className="summary-card">
+          <span>Jira ticket</span>
+          <strong>{jiraKey.trim() || "Not linked"}</strong>
         </div>
       </div>
       <div className="status-banner">
@@ -48,6 +54,7 @@ export function ComplianceSummary({
       <ul className="signal-list dense">
         <li>{unansweredRequired} questions remain unanswered in the local prototype.</li>
         <li>The current frontend summary is driven by live answers rather than placeholder numbers.</li>
+        <li>Project metadata and evidence links are stored locally for this template version.</li>
         <li>Final requirement coverage should come from backend rules evaluation and reviewer judgement.</li>
       </ul>
     </section>
