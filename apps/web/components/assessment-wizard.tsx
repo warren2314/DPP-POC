@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ParsedTemplate } from "@dpp/shared";
 import { AppShell } from "./app-shell";
 import { localDemoMetadata, sampleTemplate, type LocalAssessmentMetadata } from "../lib/mock-data";
 import { fetchLatestTemplate, OFFICIAL_TEMPLATE_KEY } from "../lib/template-client";
+import { createAssessment, linkJiraIssue, saveAnswerToApi } from "../lib/assessment-client";
 import { QuestionCard } from "./question-card";
 import { HelpDrawer } from "./help-drawer";
 import { EvidencePanel } from "./evidence-panel";
@@ -19,6 +20,9 @@ export function AssessmentWizard() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean | string | null>>({});
   const [metadata, setMetadata] = useState<LocalAssessmentMetadata>(localDemoMetadata);
+  const [apiAssessmentId, setApiAssessmentId] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [jiraSyncStatus, setJiraSyncStatus] = useState<"idle" | "syncing" | "synced" | "error">("idle");
 
   useEffect(() => {
     let isMounted = true;
@@ -26,36 +30,29 @@ export function AssessmentWizard() {
     async function loadTemplate() {
       try {
         const loadedTemplate = await fetchLatestTemplate(OFFICIAL_TEMPLATE_KEY);
-        if (!isMounted) {
-          return;
-        }
-
+        if (!isMounted) return;
         setTemplate(loadedTemplate);
         setTemplateSource("api");
         setTemplateError(null);
         setIsTemplateLoading(false);
       } catch {
-        if (!isMounted) {
-          return;
-        }
-
+        if (!isMounted) return;
         setTemplate(sampleTemplate);
         setTemplateSource("fallback");
-        setTemplateError("API template unavailable. Showing the shortened fallback template.");
+        setTemplateError("Official template unavailable — using the built-in sample template.");
         setIsTemplateLoading(false);
       }
     }
 
     void loadTemplate();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
   const activeTemplate = template ?? sampleTemplate;
   const storageKey = `dpp-local-assessment-${activeTemplate.templateKey}-${activeTemplate.version}`;
   const metadataStorageKey = `${storageKey}-metadata`;
+  const apiIdStorageKey = `${storageKey}-apiId`;
+
   const flatQuestions = activeTemplate.sections.flatMap((section, sectionIndex) =>
     section.questions.map((question, questionIndex) => ({
       ...question,
@@ -71,15 +68,9 @@ export function AssessmentWizard() {
 
   useEffect(() => {
     const savedValue = window.localStorage.getItem(storageKey);
-
-    if (!savedValue) {
-      setAnswers({});
-      return;
-    }
-
+    if (!savedValue) { setAnswers({}); return; }
     try {
-      const parsedValue = JSON.parse(savedValue) as Record<string, boolean | string | null>;
-      setAnswers(parsedValue);
+      setAnswers(JSON.parse(savedValue) as Record<string, boolean | string | null>);
     } catch {
       window.localStorage.removeItem(storageKey);
       setAnswers({});
@@ -93,18 +84,9 @@ export function AssessmentWizard() {
 
   useEffect(() => {
     const savedValue = window.localStorage.getItem(metadataStorageKey);
-
-    if (!savedValue) {
-      setMetadata(localDemoMetadata);
-      return;
-    }
-
+    if (!savedValue) { setMetadata(localDemoMetadata); return; }
     try {
-      const parsedValue = JSON.parse(savedValue) as Partial<LocalAssessmentMetadata>;
-      setMetadata({
-        ...localDemoMetadata,
-        ...parsedValue
-      });
+      setMetadata({ ...localDemoMetadata, ...(JSON.parse(savedValue) as Partial<LocalAssessmentMetadata>) });
     } catch {
       window.localStorage.removeItem(metadataStorageKey);
       setMetadata(localDemoMetadata);
@@ -115,29 +97,96 @@ export function AssessmentWizard() {
     window.localStorage.setItem(metadataStorageKey, JSON.stringify(metadata));
   }, [metadata, metadataStorageKey]);
 
-  const updateAnswer = (value: boolean | string | null) => {
-    if (!question) {
-      return;
-    }
+  useEffect(() => {
+    const savedId = window.localStorage.getItem(apiIdStorageKey);
+    if (savedId) setApiAssessmentId(savedId);
+  }, [apiIdStorageKey]);
 
-    setAnswers((current) => ({
-      ...current,
-      [question.stableKey]: value
-    }));
+  // Refs so ensureApiAssessmentId always reads current values without being in dep array
+  const metadataRef = useRef(metadata);
+  useEffect(() => { metadataRef.current = metadata; }, [metadata]);
+  const activeTemplateRef = useRef(activeTemplate);
+  useEffect(() => { activeTemplateRef.current = activeTemplate; }, [activeTemplate]);
+
+  const ensureApiAssessmentId = useCallback(async (): Promise<string | null> => {
+    if (apiAssessmentId) return apiAssessmentId;
+    const savedId = window.localStorage.getItem(apiIdStorageKey);
+    if (savedId) {
+      setApiAssessmentId(savedId);
+      return savedId;
+    }
+    try {
+      const tpl = activeTemplateRef.current;
+      const meta = metadataRef.current;
+      const result = await createAssessment({
+        templateKey: tpl.templateKey,
+        templateVersion: tpl.version,
+        productName: meta.projectName.trim() || "Unnamed project",
+        jurisdictions: tpl.jurisdictions,
+        jiraKey: meta.jiraKey.trim() || undefined
+      });
+      window.localStorage.setItem(apiIdStorageKey, result.id);
+      setApiAssessmentId(result.id);
+      return result.id;
+    } catch {
+      return null;
+    }
+  }, [apiAssessmentId, apiIdStorageKey]);
+
+  const updateAnswer = (value: boolean | string | null) => {
+    if (!question) return;
+    const key = question.stableKey;
+    setAnswers((current) => ({ ...current, [key]: value }));
+
+    if (value !== null) {
+      setSyncStatus("saving");
+      void (async () => {
+        const apiId = await ensureApiAssessmentId();
+        if (apiId) {
+          try {
+            await saveAnswerToApi(apiId, key, value);
+            setSyncStatus("saved");
+            setTimeout(() => setSyncStatus("idle"), 2000);
+          } catch {
+            setSyncStatus("error");
+          }
+        } else {
+          setSyncStatus("idle");
+        }
+      })();
+    }
   };
 
   const updateMetadata = (field: EditableAssessmentMetadataField, value: string) => {
-    setMetadata((current) => ({
-      ...current,
-      [field]: value
-    }));
+    setMetadata((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleJiraSync = async (jiraKey: string): Promise<{ jiraUrl: string } | null> => {
+    const apiId = await ensureApiAssessmentId();
+    if (!apiId) {
+      setJiraSyncStatus("error");
+      return null;
+    }
+    setJiraSyncStatus("syncing");
+    try {
+      const result = await linkJiraIssue(apiId, jiraKey);
+      setJiraSyncStatus("synced");
+      return result;
+    } catch {
+      setJiraSyncStatus("error");
+      return null;
+    }
   };
 
   const resetAnswers = () => {
     setAnswers({});
     setMetadata(localDemoMetadata);
+    setApiAssessmentId(null);
+    setSyncStatus("idle");
+    setJiraSyncStatus("idle");
     window.localStorage.removeItem(storageKey);
     window.localStorage.removeItem(metadataStorageKey);
+    window.localStorage.removeItem(apiIdStorageKey);
     setCurrentIndex(0);
   };
 
@@ -145,7 +194,6 @@ export function AssessmentWizard() {
     const sectionQuestions = flatQuestions.filter((entry) => entry.sectionKey === section.key);
     const sectionAnswered = sectionQuestions.filter((entry) => answers[entry.stableKey] !== undefined).length;
     const firstQuestionIndex = flatQuestions.findIndex((entry) => entry.sectionKey === section.key);
-
     return {
       key: section.key,
       title: section.title,
@@ -160,7 +208,7 @@ export function AssessmentWizard() {
       <AppShell
         eyebrow="Guided Assessment"
         title="Loading assessment template"
-        subtitle="The questionnaire is loading from the markdown-backed template service."
+        subtitle="Fetching the questionnaire from the template service."
       >
         <section className="panel">
           <p>Loading template content...</p>
@@ -183,19 +231,28 @@ export function AssessmentWizard() {
     );
   }
 
+  const syncLabel =
+    syncStatus === "saving" ? "Saving…" :
+    syncStatus === "saved" ? "Saved" :
+    syncStatus === "error" ? "Save failed — answers kept locally" :
+    null;
+
   return (
     <AppShell
       eyebrow="Guided Assessment"
       title={activeTemplate.title}
-      subtitle="This workspace should reduce ambiguity: the question, interpretation, evidence expectation, and reviewer posture should all be visible at once."
+      subtitle="Answer each question using the guidance provided. Evidence links and reviewer context appear alongside each question."
       actions={
         <div className="topbar-actions">
           <span className={`tag ${templateSource === "api" ? "soft" : "strong"}`}>
-            {templateSource === "api" ? "Loaded from API" : "Fallback sample"}
+            {templateSource === "api" ? "Official template" : "Sample template"}
           </span>
           <span className="tag strong">{completionPercent}% complete</span>
+          {syncLabel ? (
+            <span className={`tag ${syncStatus === "error" ? "strong" : "soft"}`}>{syncLabel}</span>
+          ) : null}
           <button className="secondary-button" onClick={resetAnswers} type="button">
-            Reset prototype
+            Reset assessment
           </button>
         </div>
       }
@@ -232,7 +289,12 @@ export function AssessmentWizard() {
         </section>
       ) : null}
 
-      <AssessmentMetadataPanel metadata={metadata} onChange={updateMetadata} />
+      <AssessmentMetadataPanel
+        metadata={metadata}
+        onChange={updateMetadata}
+        onJiraSync={handleJiraSync}
+        jiraSyncStatus={jiraSyncStatus}
+      />
 
       <section className="wizard-layout">
         <nav className="panel nav-panel structured">
@@ -261,7 +323,7 @@ export function AssessmentWizard() {
                     </span>
                   </div>
                   <span className={`status-pill ${isComplete ? "good" : isActive ? "warning" : "neutral"}`}>
-                    {isComplete ? "Ready" : isActive ? "In focus" : "Open"}
+                    {isComplete ? "Done" : isActive ? "In progress" : "Open"}
                   </span>
                 </button>
               );

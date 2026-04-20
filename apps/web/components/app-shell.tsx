@@ -16,8 +16,7 @@ interface AppShellProps {
 const NAV_ITEMS: Array<{ href: Route; label: string }> = [
   { href: "/", label: "Overview" },
   { href: "/assessments/new", label: "New Assessment" },
-  { href: "/templates", label: "Templates" },
-  { href: "/reports/ASM-2026-001" as Route, label: "Report Preview" }
+  { href: "/templates", label: "Templates" }
 ];
 
 export function AppShell({ title, subtitle, eyebrow, actions, children }: AppShellProps) {
@@ -46,21 +45,12 @@ export function AppShell({ title, subtitle, eyebrow, actions, children }: AppShe
           })}
         </nav>
 
-        <section className="sidebar-card">
-          <p className="sidebar-label">Operating mode</p>
-          <strong>Local prototype</strong>
-          <p>
-            Markdown remains the source of truth. This shell is for validating flow, hierarchy, and guidance before
-            full API persistence is wired.
-          </p>
-        </section>
-
         <section className="sidebar-card muted">
-          <p className="sidebar-label">Reviewer expectation</p>
+          <p className="sidebar-label">Reviewer expectations</p>
           <ul className="plain-list">
-            <li>Answers must be traceable to the published template version.</li>
-            <li>Threat model and TAM evidence should appear in the workflow, not in a separate email thread.</li>
-            <li>Coverage summaries should assist decisions, not replace reviewers.</li>
+            <li>Answers are traceable to the exact template version used.</li>
+            <li>Threat model and TAM evidence appear in the workflow alongside each question.</li>
+            <li>Coverage summaries inform reviewer judgement — they do not replace it.</li>
           </ul>
         </section>
       </aside>

@@ -107,6 +107,21 @@ export class AssessmentService {
     return this.getAssessment(assessmentId);
   }
 
+  listAssessments() {
+    return Array.from(this.assessments.values()).map((record) => ({
+      id: record.id,
+      templateKey: record.templateKey,
+      templateVersion: record.templateVersion,
+      productName: record.productName,
+      jurisdictions: record.jurisdictions,
+      jiraKey: record.jiraKey,
+      status: record.status,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      answeredCount: record.answers.length
+    }));
+  }
+
   submitAssessment(assessmentId: string, input: { submittedBy: string; reviewers: string[] }) {
     const record = this.assessments.get(assessmentId);
     if (!record) {

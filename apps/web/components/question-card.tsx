@@ -62,7 +62,15 @@ export function QuestionCard({ question, value, onChange }: QuestionCardProps) {
 
       <div className="answer-status">
         <strong>Current answer</strong>
-        <span>{value === null ? "Not answered yet" : String(value)}</span>
+        <span>
+          {value === null
+            ? "Not answered yet"
+            : value === true
+              ? "Yes"
+              : value === false
+                ? "No"
+                : String(value).replaceAll("_", " ")}
+        </span>
       </div>
 
       {question.guidance?.prompts?.length ? (
@@ -99,9 +107,6 @@ export function QuestionCard({ question, value, onChange }: QuestionCardProps) {
         </div>
       ) : null}
 
-      <div className="question-footer compact">
-        <span>This question is rendered directly from the published markdown template and should remain version-traceable.</span>
-      </div>
     </article>
   );
 }

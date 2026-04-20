@@ -52,10 +52,9 @@ export function ComplianceSummary({
         </p>
       </div>
       <ul className="signal-list dense">
-        <li>{unansweredRequired} questions remain unanswered in the local prototype.</li>
-        <li>The current frontend summary is driven by live answers rather than placeholder numbers.</li>
-        <li>Project metadata and evidence links are stored locally for this template version.</li>
-        <li>Final requirement coverage should come from backend rules evaluation and reviewer judgement.</li>
+        <li>{unansweredRequired > 0 ? `${unansweredRequired} question${unansweredRequired === 1 ? "" : "s"} still need${unansweredRequired === 1 ? "s" : ""} an answer.` : "All questions answered — ready for reviewer summary."}</li>
+        <li>Answers and project metadata are saved automatically as you work.</li>
+        {jiraKey.trim() ? <li>Linked to Jira ticket {jiraKey.trim()}.</li> : <li>No Jira ticket linked yet — add one in the details panel above.</li>}
       </ul>
     </section>
   );

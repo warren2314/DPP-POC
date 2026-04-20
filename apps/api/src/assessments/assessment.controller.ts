@@ -6,6 +6,11 @@ import { AssessmentService } from "./assessment.service";
 export class AssessmentController {
   constructor(private readonly assessmentService: AssessmentService) {}
 
+  @Get()
+  listAssessments() {
+    return this.assessmentService.listAssessments();
+  }
+
   @Post()
   createAssessment(
     @Body()

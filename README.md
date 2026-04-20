@@ -1,58 +1,95 @@
 # DPP Assessment Platform
 
-Starter monorepo for an internal SAP Fioneer-style DPP assessment application that replaces an Excel checklist with a guided, versioned, markdown-driven workflow.
+Internal SAP Fioneer privacy assessment platform. Replaces the Excel checklist with a guided, versioned, markdown-driven workflow where answers are traceable to the exact template version used.
 
-## What this scaffold contains
+## What this contains
 
-- `docs/dpp-assessment-design.md`: product, domain, workflow, UX, rules, API, schema, and roadmap design.
-- `templates/privacy_compliance_checklist.enriched.v1.md`: governed markdown template format derived from the current checklist.
-- `docs/example-parsed-template.json`: example runtime JSON produced by the parser.
-- `apps/api`: NestJS-style backend skeleton for templates, assessments, rules, reports, and Jira integration.
-- `apps/web`: Next.js-style frontend skeleton for dashboard, guided assessment, admin template management, and report preview.
-- `packages/shared`: shared types for templates, answers, compliance summaries, and reporting.
+- `docs/dpp-assessment-design.md` — product, domain, workflow, UX, rules, API, schema, and roadmap design
+- `templates/privacy_compliance_checklist.enriched.v1.md` — governed markdown template format
+- `docs/example-parsed-template.json` — example runtime JSON produced by the parser
+- `apps/api` — NestJS backend: templates, assessments, compliance rules, reports, Jira integration
+- `apps/web` — Next.js frontend: dashboard, guided assessment wizard, template registry, report preview
+- `packages/shared` — shared TypeScript types across API and web
 
 ## Key design decisions
 
-- Markdown remains the primary source of truth for assessment content.
-- Every uploaded template version is stored with a checksum and parsed snapshot so historic assessments remain pinned to the exact template used.
-- Compliance logic is explainable and assistive. It does not replace expert review.
-- Threat modelling and TAM evidence are first-class parts of the workflow, not optional attachments bolted on at the end.
+- Markdown is the source of truth for assessment content. Template versions are immutable snapshots with checksums.
+- Every answer is pinned to the exact template version shown at time of response.
+- Compliance logic is explainable and assistive — it does not replace expert review.
+- Threat model and TAM evidence are first-class parts of the workflow, not optional attachments.
 
-## Recommended local setup
+## Local setup
 
-1. Start PostgreSQL locally with `docker compose up -d`.
-2. Install dependencies with `npm install`.
-3. Run the API with `npm run dev:api`.
-4. Run the frontend with `npm run dev:web`.
+### Prerequisites
 
-## Windows PowerShell note
+- Node.js 20+
+- Docker (for PostgreSQL)
 
-If PowerShell blocks `npm.ps1` on your machine, use `npm.cmd` instead:
+### Steps
 
-1. `npm.cmd install`
-2. `npm.cmd run dev:api`
-3. `npm.cmd run dev:web`
+1. Copy the environment file and fill in your values:
+   ```
+   cp .env.example .env
+   ```
+2. Start PostgreSQL:
+   ```
+   docker compose up -d
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Start the API (port 3001):
+   ```
+   npm run dev:api
+   ```
+5. Start the frontend (port 3000):
+   ```
+   npm run dev:web
+   ```
 
-Useful verification commands:
+Open the guided assessment at `http://localhost:3000`.
 
-- `npm.cmd run build --workspace @dpp/api`
-- `npm.cmd run build --workspace @dpp/web`
+### Windows PowerShell note
 
-Open the guided assessment at `http://localhost:3000/assessments/new`.
+If PowerShell blocks `npm.ps1`, use `npm.cmd` instead — e.g. `npm.cmd run dev:api`.
 
-## Current prototype behavior
+## Environment variables
 
-- The assessment wizard now keeps local answer state, so `Yes` / `No` / `Unsure` selections are clickable.
-- Completion starts at `0%` and updates from actual answers instead of a hard-coded placeholder.
-- Jira and evidence panels default to neutral local-prototype values rather than fake linked records.
-- The frontend is still in local-state mode; it is not yet wired to persist answers through the API.
+See `.env.example` for the full list with descriptions. Key variables:
 
-## Assumptions
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXT_PUBLIC_API_BASE_URL` | API base URL consumed by the frontend |
+| `JIRA_BASE_URL` | Jira Cloud (`https://your-domain.atlassian.net`) or Server URL |
+| `JIRA_USERNAME` | Service account email (Cloud) or username (Server/DC) |
+| `JIRA_API_TOKEN` | API token — generate at [id.atlassian.com](https://id.atlassian.com/manage-profile/security/api-tokens) |
+| `JIRA_PROJECT_KEY` | Default project key for new issues (e.g. `WAR`) |
 
-- Internal users authenticate through corporate SSO such as Entra ID or SAP Identity Authentication.
-- Jira is available via REST API with a service account or OAuth app.
-- Threat model and TAM artifacts may be uploaded or linked from internal document systems.
+## Jira integration
 
-## Current source material
+In the assessment wizard, enter a Jira ticket key (e.g. `WAR-123`) in the **Project and evidence links** panel. A **Sync to Jira** button appears — clicking it posts a comment to that ticket with the assessment ID, template version, jurisdictions, and compliance status.
 
-The original checklist is preserved in [privacy_compliance_checklist.md](/c:/Users/warre/Downloads/DPP/privacy_compliance_checklist.md). The enriched governed template example lives in [templates/privacy_compliance_checklist.enriched.v1.md](/c:/Users/warre/Downloads/DPP/templates/privacy_compliance_checklist.enriched.v1.md).
+To create a new Jira issue instead of linking an existing one, use `POST /api/assessments/:id/jira-links` with `{ "mode": "create" }`.
+
+Jira sync requires `JIRA_BASE_URL`, `JIRA_USERNAME`, and `JIRA_API_TOKEN` to be set in `.env`.
+
+## API persistence
+
+Answers are saved to the backend automatically as you respond to each question. The assessment is created on the API on the first answer given. Answers are also kept in `localStorage` as a local fallback.
+
+The in-memory store (`Map`) means assessments are lost when the API restarts. Wiring to PostgreSQL via the existing Prisma schema is the next persistence step.
+
+## Current limitations
+
+- Assessment store is in-memory — data is lost on API restart. Prisma schema exists and is ready to wire.
+- Jira "create" mode is implemented but not yet exposed in the UI — link mode (attach to existing ticket) is the default UI flow.
+- PDF report export is not yet implemented. HTML report generation works via `GET /api/reports/:assessmentId`.
+- Authentication middleware is not wired. `AUTH_PROVIDER=entra-id` is configured in env but not enforced.
+- Reviewer workflow (comments, approvals, status changes) is designed but not yet built.
+
+## Original source material
+
+The original checklist: [privacy_compliance_checklist.md](privacy_compliance_checklist.md)  
+Enriched governed template: [templates/privacy_compliance_checklist.enriched.v1.md](templates/privacy_compliance_checklist.enriched.v1.md)

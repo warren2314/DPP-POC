@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { AppShell } from "./app-shell";
-import { localDemoMetadata, sampleTemplate } from "../lib/mock-data";
+import { sampleTemplate } from "../lib/mock-data";
+import { SavedAssessmentsList } from "./saved-assessments-list";
 
 export function DashboardShell() {
   return (
     <AppShell
       eyebrow="DPP Assessment Platform"
-      title="Operational workspace for guided privacy assessments"
-      subtitle="Designed to replace spreadsheet-driven ambiguity with a reviewable, markdown-governed workflow that teams can actually navigate."
+      title="Privacy assessment workspace"
+      subtitle="Guided, markdown-governed assessments with traceable answers and built-in reviewer context."
       actions={
         <Link href="/assessments/new" className="primary-button">
           Start assessment
@@ -18,12 +19,12 @@ export function DashboardShell() {
         <div className="hero-copy-block">
           <div className="eyebrow-row">
             <span className="tag strong">Template {sampleTemplate.version}</span>
-            <span className="tag soft">{localDemoMetadata.environment}</span>
+            <span className="tag soft">{sampleTemplate.jurisdictions.join(", ")}</span>
           </div>
-          <h2 className="hero-title">Assessment work should feel like a governed operating model, not a spreadsheet with legal language.</h2>
+          <h2 className="hero-title">Replace spreadsheet-driven ambiguity with a reviewable, markdown-governed workflow.</h2>
           <p className="hero-copy">
-            This product is structured around three things: the published markdown template, guided user interpretation,
-            and traceable reviewer judgement. That should be immediately visible in the UI.
+            Each question shows plain-English guidance, evidence expectations, and reviewer context in one place.
+            Answers are version-pinned to the published template and saved automatically.
           </p>
           <div className="hero-actions">
             <Link href="/assessments/new" className="primary-button">
@@ -37,8 +38,8 @@ export function DashboardShell() {
 
         <div className="hero-stack">
           <div className="metric-card emphasis">
-            <span>Current operating pattern</span>
-            <strong>Markdown template to guided answers to reviewer summary</strong>
+            <span>Workflow</span>
+            <strong>Markdown template → guided answers → reviewer summary</strong>
           </div>
           <div className="metric-grid">
             <div className="metric-card">
@@ -46,7 +47,7 @@ export function DashboardShell() {
               <strong>Version-pinned markdown</strong>
             </div>
             <div className="metric-card">
-              <span>Threat model/TAM</span>
+              <span>Threat model / TAM</span>
               <strong>Evidence in workflow</strong>
             </div>
             <div className="metric-card">
@@ -54,8 +55,8 @@ export function DashboardShell() {
               <strong>Explainable, not black-box</strong>
             </div>
             <div className="metric-card">
-              <span>Jira status</span>
-              <strong>Not linked yet</strong>
+              <span>Persistence</span>
+              <strong>Local + API sync</strong>
             </div>
           </div>
         </div>
@@ -66,30 +67,27 @@ export function DashboardShell() {
           <div className="panel-head">
             <div>
               <p className="section-kicker">Assessment operations</p>
-              <h2>Current workspace state</h2>
+              <h2>In-progress assessments</h2>
             </div>
+            <Link href="/assessments/new" className="action-link">
+              New assessment
+            </Link>
           </div>
           <div className="list-board">
-            <div className="board-row">
-              <div>
-                <strong>Saved assessments</strong>
-                <p>No persisted assessments are loaded into the dashboard yet.</p>
-              </div>
-              <span className="status-pill neutral">Prototype mode</span>
-            </div>
+            <SavedAssessmentsList />
             <div className="board-row">
               <div>
                 <strong>Guidance system</strong>
-                <p>Questions show plain-English help, examples, and rationale in context.</p>
+                <p>Questions include plain-English help, examples, and rationale.</p>
               </div>
-              <span className="status-pill good">Available</span>
+              <span className="status-pill good">Active</span>
             </div>
             <div className="board-row">
               <div>
-                <strong>Backend persistence</strong>
-                <p>The live API exists, but the frontend is not yet posting assessments end to end.</p>
+                <strong>API persistence</strong>
+                <p>Answers are synced to the backend on each response. Saved locally as backup.</p>
               </div>
-              <span className="status-pill warning">Next build step</span>
+              <span className="status-pill good">Active</span>
             </div>
           </div>
         </article>
@@ -98,14 +96,14 @@ export function DashboardShell() {
           <div className="panel-head">
             <div>
               <p className="section-kicker">Reviewer lens</p>
-              <h2>What should stand out</h2>
+              <h2>What reviewers need to see</h2>
             </div>
           </div>
           <ul className="signal-list dense">
-            <li>Users should know what a question means before they answer it.</li>
-            <li>Evidence requests should appear when the architecture implies they matter.</li>
-            <li>Jurisdiction outcomes should point to requirements and unanswered gaps.</li>
-            <li>Historic assessments must remain tied to the exact template version used.</li>
+            <li>Each answer is traceable to the template version and guidance shown at time of response.</li>
+            <li>Evidence requests appear when the architecture implies they matter.</li>
+            <li>Jurisdiction outcomes point to specific requirements and unanswered gaps.</li>
+            <li>Threat model and TAM links are captured in the workflow, not in a separate email chain.</li>
           </ul>
         </article>
 
@@ -133,7 +131,7 @@ export function DashboardShell() {
               <strong>Published markdown</strong>
             </div>
             <div className="governance-card">
-              <span>Version behavior</span>
+              <span>Version behaviour</span>
               <strong>Immutable snapshots</strong>
             </div>
           </div>

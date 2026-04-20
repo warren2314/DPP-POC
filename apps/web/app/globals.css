@@ -713,6 +713,34 @@ ul {
   line-height: 1.45;
 }
 
+.metadata-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.metadata-input-row .metadata-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.secondary-button.compact {
+  padding: 0 14px;
+  min-height: 46px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.secondary-button.success {
+  border-color: rgba(15, 118, 110, 0.5);
+  color: rgb(15, 118, 110);
+}
+
+.secondary-button.danger {
+  border-color: rgba(185, 28, 28, 0.5);
+  color: rgb(185, 28, 28);
+}
+
 .artifact-link {
   width: fit-content;
   color: var(--accent-deep);
