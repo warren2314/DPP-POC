@@ -14,9 +14,9 @@ interface AppShellProps {
 }
 
 const NAV_ITEMS: Array<{ href: Route; label: string }> = [
-  { href: "/", label: "Overview" },
-  { href: "/assessments/new", label: "New Assessment" },
-  { href: "/templates", label: "Templates" }
+  { href: "/", label: "Dashboard" },
+  { href: "/assessments/new", label: "Assessment Flow" },
+  { href: "/templates", label: "Template Registry" }
 ];
 
 export function AppShell({ title, subtitle, eyebrow, actions, children }: AppShellProps) {
@@ -26,10 +26,10 @@ export function AppShell({ title, subtitle, eyebrow, actions, children }: AppShe
     <div className="workspace-shell">
       <aside className="workspace-sidebar">
         <div className="brand-block">
-          <span className="brand-mark">DPP</span>
+          <img className="brand-logo" src="/sap-fioneer-logo.svg" alt="SAP Fioneer" />
           <div>
-            <strong>SAP Fioneer</strong>
-            <p>Assessment workspace</p>
+            <strong>Privacy Governance</strong>
+            <p>Corporate assessment workspace</p>
           </div>
         </div>
 
@@ -46,11 +46,11 @@ export function AppShell({ title, subtitle, eyebrow, actions, children }: AppShe
         </nav>
 
         <section className="sidebar-card muted">
-          <p className="sidebar-label">Reviewer expectations</p>
+          <p className="sidebar-label">Governance standards</p>
           <ul className="plain-list">
-            <li>Answers are traceable to the exact template version used.</li>
-            <li>Threat model and TAM evidence appear in the workflow alongside each question.</li>
-            <li>Coverage summaries inform reviewer judgement — they do not replace it.</li>
+            <li>Every answer is traceable to the active template version.</li>
+            <li>Architecture evidence is reviewed with the relevant question.</li>
+            <li>Coverage summaries support reviewer judgement and approval decisions.</li>
           </ul>
         </section>
       </aside>

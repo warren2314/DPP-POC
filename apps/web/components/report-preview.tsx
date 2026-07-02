@@ -5,23 +5,23 @@ export function ReportPreview() {
         <div className="report-hero">
           <div>
             <p className="eyebrow">Report Preview</p>
-            <h1>DPP Assessment Report</h1>
+            <h1>Privacy Assessment Report</h1>
             <p className="hero-copy">
-              Report output should read like a professional internal governance artefact: clear provenance, executive
-              summary, requirement posture, reviewer notes, and linked evidence.
+              Assessment output is structured for internal governance review: clear provenance, executive summary,
+              requirement posture, reviewer notes, and linked evidence.
             </p>
           </div>
-          <div className="report-badge">Draft snapshot</div>
+          <div className="report-badge">Reviewer snapshot</div>
         </div>
 
         <div className="report-meta-grid">
           <div>
             <span>Assessment ID</span>
-            <strong>ASM-2026-001</strong>
+            <strong>Pending assignment</strong>
           </div>
           <div>
             <span>Product</span>
-            <strong>Collections Portal</strong>
+            <strong>In-scope product</strong>
           </div>
           <div>
             <span>Jurisdictions</span>
@@ -36,20 +36,19 @@ export function ReportPreview() {
         <section className="report-section">
           <h2>Executive Summary</h2>
           <p>
-            The assessed solution appears to process direct identifiers and technical identifiers. The template-driven
-            workflow has identified missing threat-model evidence and one reviewer clarification area for automated
-            decision safeguards.
+            The assessed solution processes direct identifiers and technical identifiers. The workflow highlights
+            evidence needed for threat-model coverage and reviewer confirmation of automated-decision safeguards.
           </p>
         </section>
 
         <section className="report-section two-column">
           <div>
             <h2>Scope</h2>
-            <p>In scope: customer-facing onboarding workflow, supporting APIs, audit logging, and support-access flows.</p>
+            <p>In scope: customer-facing workflow, supporting APIs, audit logging, and support-access flows.</p>
           </div>
           <div>
             <h2>Evidence posture</h2>
-            <p>Threat model evidence is incomplete. TAM coverage is present but requires reviewer confirmation.</p>
+            <p>Threat model evidence requires review. TAM coverage is present and should be confirmed by the reviewer.</p>
           </div>
         </section>
 
@@ -71,8 +70,8 @@ export function ReportPreview() {
               </tr>
               <tr>
                 <td>EU_GDPR:ART_22_AUTOMATED_DECISIONS</td>
-                <td>Insufficient evidence</td>
-                <td>Human-intervention design still requires clearer operational evidence.</td>
+                <td>Evidence required</td>
+                <td>Human-intervention design requires clear operational evidence before approval.</td>
               </tr>
             </tbody>
           </table>
@@ -81,11 +80,11 @@ export function ReportPreview() {
         <section className="report-section two-column">
           <div>
             <h2>Reviewer Notes</h2>
-            <p>Clarify whether automated decision overrides are operationally enforced or only procedurally described.</p>
+            <p>Clarify whether automated decision overrides are operationally enforced or procedurally described.</p>
           </div>
           <div>
             <h2>Jira Linkage</h2>
-            <p>No Jira issue linked in the local prototype. Production flow should record issue key, sync status, and report URL.</p>
+            <p>Linked Jira issues should include the assessment record, sync status, and report URL.</p>
           </div>
         </section>
       </section>

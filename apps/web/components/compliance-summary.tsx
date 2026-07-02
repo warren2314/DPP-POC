@@ -52,9 +52,9 @@ export function ComplianceSummary({
         </p>
       </div>
       <ul className="signal-list dense">
-        <li>{unansweredRequired > 0 ? `${unansweredRequired} question${unansweredRequired === 1 ? "" : "s"} still need${unansweredRequired === 1 ? "s" : ""} an answer.` : "All questions answered — ready for reviewer summary."}</li>
+        <li>{unansweredRequired > 0 ? `${unansweredRequired} question${unansweredRequired === 1 ? "" : "s"} still need${unansweredRequired === 1 ? "s" : ""} an answer.` : "All questions answered. Ready for reviewer summary."}</li>
         <li>Answers and project metadata are saved automatically as you work.</li>
-        {jiraKey.trim() ? <li>Linked to Jira ticket {jiraKey.trim()}.</li> : <li>No Jira ticket linked yet — add one in the details panel above.</li>}
+        {jiraKey.trim() ? <li>Linked to Jira ticket {jiraKey.trim()}.</li> : <li>No Jira ticket linked yet. Add one in the details panel above.</li>}
       </ul>
     </section>
   );

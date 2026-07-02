@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import type { Route } from "next";
 import type { LocalAssessmentMetadata } from "../lib/mock-data";
+import { listAssessments, type ApiAssessmentSummary } from "../lib/assessment-client";
 
 interface LocalAssessmentEntry {
   templateKey: string;
@@ -39,20 +41,42 @@ function readLocalAssessments(): LocalAssessmentEntry[] {
         storageKey: answersKey
       });
     } catch {
-      // skip corrupted entries
+      // Ignore invalid browser entries without blocking the dashboard.
     }
   }
 
   return found;
 }
 
+function formatStatus(status: ApiAssessmentSummary["status"]) {
+  return status.replaceAll("_", " ");
+}
+
 export function SavedAssessmentsList() {
-  const [entries, setEntries] = useState<LocalAssessmentEntry[]>([]);
+  const [apiEntries, setApiEntries] = useState<ApiAssessmentSummary[]>([]);
+  const [localEntries, setLocalEntries] = useState<LocalAssessmentEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setEntries(readLocalAssessments());
-    setLoaded(true);
+    let active = true;
+
+    async function loadAssessments() {
+      const [apiAssessments, browserAssessments] = await Promise.all([
+        listAssessments(),
+        Promise.resolve(readLocalAssessments())
+      ]);
+
+      if (!active) return;
+      setApiEntries(apiAssessments);
+      setLocalEntries(browserAssessments);
+      setLoaded(true);
+    }
+
+    void loadAssessments();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   if (!loaded) {
@@ -60,39 +84,54 @@ export function SavedAssessmentsList() {
       <div className="board-row">
         <div>
           <strong>Saved assessments</strong>
-          <p>Loading...</p>
+          <p>Loading assessment records...</p>
         </div>
       </div>
     );
   }
 
-  if (entries.length === 0) {
+  if (apiEntries.length === 0 && localEntries.length === 0) {
     return (
       <div className="board-row">
         <div>
           <strong>No in-progress assessments</strong>
-          <p>Start a new assessment to begin. Your answers will be saved automatically.</p>
+          <p>Start a new assessment to create the first governance record.</p>
         </div>
-        <span className="status-pill neutral">None saved</span>
+        <span className="status-pill neutral">None open</span>
       </div>
     );
   }
 
   return (
     <>
-      {entries.map((entry) => (
+      {apiEntries.map((entry) => (
+        <div className="board-row" key={entry.id}>
+          <div>
+            <strong>{entry.productName || "Unnamed product"}</strong>
+            <p>
+              {entry.templateKey} v{entry.templateVersion}
+              {entry.jiraKey ? ` | ${entry.jiraKey}` : ""}
+              {` | ${entry.answeredCount} question${entry.answeredCount === 1 ? "" : "s"} answered`}
+            </p>
+          </div>
+          <Link className="status-pill good" href={`/assessments/${entry.id}` as Route}>
+            {formatStatus(entry.status)}
+          </Link>
+        </div>
+      ))}
+
+      {localEntries.map((entry) => (
         <div className="board-row" key={entry.storageKey}>
           <div>
-            <strong>{entry.metadata.projectName.trim() || "Unnamed project"}</strong>
+            <strong>{entry.metadata.projectName.trim() || "Unnamed product"}</strong>
             <p>
               {entry.templateKey} v{entry.version}
-              {entry.metadata.jiraKey ? ` · ${entry.metadata.jiraKey}` : ""}
-              {" · "}
-              {entry.answeredCount} question{entry.answeredCount === 1 ? "" : "s"} answered
+              {entry.metadata.jiraKey ? ` | ${entry.metadata.jiraKey}` : ""}
+              {` | ${entry.answeredCount} question${entry.answeredCount === 1 ? "" : "s"} answered`}
             </p>
           </div>
           <Link className="status-pill warning" href="/assessments/new">
-            Resume
+            Local draft
           </Link>
         </div>
       ))}

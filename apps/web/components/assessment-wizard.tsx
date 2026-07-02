@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ParsedTemplate } from "@dpp/shared";
 import { AppShell } from "./app-shell";
-import { localDemoMetadata, sampleTemplate, type LocalAssessmentMetadata } from "../lib/mock-data";
+import { defaultAssessmentMetadata, governedFallbackTemplate, type LocalAssessmentMetadata } from "../lib/mock-data";
 import { fetchLatestTemplate, OFFICIAL_TEMPLATE_KEY } from "../lib/template-client";
 import { createAssessment, linkJiraIssue, saveAnswerToApi } from "../lib/assessment-client";
 import { QuestionCard } from "./question-card";
@@ -15,11 +15,11 @@ import { AssessmentMetadataPanel, type EditableAssessmentMetadataField } from ".
 export function AssessmentWizard() {
   const [template, setTemplate] = useState<ParsedTemplate | null>(null);
   const [isTemplateLoading, setIsTemplateLoading] = useState(true);
-  const [templateSource, setTemplateSource] = useState<"api" | "fallback">("fallback");
+  const [templateSource, setTemplateSource] = useState<"api" | "bundled">("bundled");
   const [templateError, setTemplateError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean | string | null>>({});
-  const [metadata, setMetadata] = useState<LocalAssessmentMetadata>(localDemoMetadata);
+  const [metadata, setMetadata] = useState<LocalAssessmentMetadata>(defaultAssessmentMetadata);
   const [apiAssessmentId, setApiAssessmentId] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [jiraSyncStatus, setJiraSyncStatus] = useState<"idle" | "syncing" | "synced" | "error">("idle");
@@ -37,9 +37,9 @@ export function AssessmentWizard() {
         setIsTemplateLoading(false);
       } catch {
         if (!isMounted) return;
-        setTemplate(sampleTemplate);
-        setTemplateSource("fallback");
-        setTemplateError("Official template unavailable — using the built-in sample template.");
+        setTemplate(governedFallbackTemplate);
+        setTemplateSource("bundled");
+        setTemplateError("Template service unavailable. The bundled governed template is active for continuity.");
         setIsTemplateLoading(false);
       }
     }
@@ -48,7 +48,7 @@ export function AssessmentWizard() {
     return () => { isMounted = false; };
   }, []);
 
-  const activeTemplate = template ?? sampleTemplate;
+  const activeTemplate = template ?? governedFallbackTemplate;
   const storageKey = `dpp-local-assessment-${activeTemplate.templateKey}-${activeTemplate.version}`;
   const metadataStorageKey = `${storageKey}-metadata`;
   const apiIdStorageKey = `${storageKey}-apiId`;
@@ -84,12 +84,12 @@ export function AssessmentWizard() {
 
   useEffect(() => {
     const savedValue = window.localStorage.getItem(metadataStorageKey);
-    if (!savedValue) { setMetadata(localDemoMetadata); return; }
+    if (!savedValue) { setMetadata(defaultAssessmentMetadata); return; }
     try {
-      setMetadata({ ...localDemoMetadata, ...(JSON.parse(savedValue) as Partial<LocalAssessmentMetadata>) });
+      setMetadata({ ...defaultAssessmentMetadata, ...(JSON.parse(savedValue) as Partial<LocalAssessmentMetadata>) });
     } catch {
       window.localStorage.removeItem(metadataStorageKey);
-      setMetadata(localDemoMetadata);
+      setMetadata(defaultAssessmentMetadata);
     }
   }, [metadataStorageKey]);
 
@@ -180,7 +180,7 @@ export function AssessmentWizard() {
 
   const resetAnswers = () => {
     setAnswers({});
-    setMetadata(localDemoMetadata);
+    setMetadata(defaultAssessmentMetadata);
     setApiAssessmentId(null);
     setSyncStatus("idle");
     setJiraSyncStatus("idle");
@@ -232,9 +232,9 @@ export function AssessmentWizard() {
   }
 
   const syncLabel =
-    syncStatus === "saving" ? "Saving…" :
+    syncStatus === "saving" ? "Saving..." :
     syncStatus === "saved" ? "Saved" :
-    syncStatus === "error" ? "Save failed — answers kept locally" :
+    syncStatus === "error" ? "Save failed. Answers are retained locally." :
     null;
 
   return (
@@ -245,7 +245,7 @@ export function AssessmentWizard() {
       actions={
         <div className="topbar-actions">
           <span className={`tag ${templateSource === "api" ? "soft" : "strong"}`}>
-            {templateSource === "api" ? "Official template" : "Sample template"}
+            {templateSource === "api" ? "Template service" : "Bundled template"}
           </span>
           <span className="tag strong">{completionPercent}% complete</span>
           {syncLabel ? (

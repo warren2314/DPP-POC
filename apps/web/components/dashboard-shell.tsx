@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { AppShell } from "./app-shell";
-import { sampleTemplate } from "../lib/mock-data";
+import { governedFallbackTemplate } from "../lib/mock-data";
 import { SavedAssessmentsList } from "./saved-assessments-list";
 
 export function DashboardShell() {
   return (
     <AppShell
-      eyebrow="DPP Assessment Platform"
-      title="Privacy assessment workspace"
-      subtitle="Guided, markdown-governed assessments with traceable answers and built-in reviewer context."
+      eyebrow="SAP Fioneer Privacy Governance"
+      title="Corporate assessment control centre"
+      subtitle="Run privacy and data protection assessments with governed templates, traceable answers, and reviewer-ready evidence."
       actions={
         <Link href="/assessments/new" className="primary-button">
           Start assessment
@@ -18,20 +18,20 @@ export function DashboardShell() {
       <section className="hero-panel">
         <div className="hero-copy-block">
           <div className="eyebrow-row">
-            <span className="tag strong">Template {sampleTemplate.version}</span>
-            <span className="tag soft">{sampleTemplate.jurisdictions.join(", ")}</span>
+            <span className="tag strong">Template {governedFallbackTemplate.version}</span>
+            <span className="tag soft">{governedFallbackTemplate.jurisdictions.join(", ")}</span>
           </div>
-          <h2 className="hero-title">Replace spreadsheet-driven ambiguity with a reviewable, markdown-governed workflow.</h2>
+          <h2 className="hero-title">A controlled workflow for privacy assessment intake, evidence, and review.</h2>
           <p className="hero-copy">
-            Each question shows plain-English guidance, evidence expectations, and reviewer context in one place.
-            Answers are version-pinned to the published template and saved automatically.
+            Each assessment follows the active governed template, captures architecture evidence in context, and keeps
+            answers version-pinned for review and audit.
           </p>
           <div className="hero-actions">
             <Link href="/assessments/new" className="primary-button">
-              Open guided flow
+              Open assessment flow
             </Link>
             <Link href="/templates" className="secondary-button">
-              Review template governance
+              Review template registry
             </Link>
           </div>
         </div>
@@ -39,7 +39,7 @@ export function DashboardShell() {
         <div className="hero-stack">
           <div className="metric-card emphasis">
             <span>Workflow</span>
-            <strong>Markdown template → guided answers → reviewer summary</strong>
+            <strong>Governed template to guided answers to reviewer summary</strong>
           </div>
           <div className="metric-grid">
             <div className="metric-card">
@@ -52,7 +52,7 @@ export function DashboardShell() {
             </div>
             <div className="metric-card">
               <span>Compliance output</span>
-              <strong>Explainable, not black-box</strong>
+              <strong>Explainable reviewer posture</strong>
             </div>
             <div className="metric-card">
               <span>Persistence</span>
@@ -78,14 +78,14 @@ export function DashboardShell() {
             <div className="board-row">
               <div>
                 <strong>Guidance system</strong>
-                <p>Questions include plain-English help, examples, and rationale.</p>
+                <p>Questions include reviewer guidance, evidence expectations, and rationale.</p>
               </div>
               <span className="status-pill good">Active</span>
             </div>
             <div className="board-row">
               <div>
                 <strong>API persistence</strong>
-                <p>Answers are synced to the backend on each response. Saved locally as backup.</p>
+                <p>Answers sync to the assessment API and remain available in the browser workspace.</p>
               </div>
               <span className="status-pill good">Active</span>
             </div>
@@ -103,7 +103,7 @@ export function DashboardShell() {
             <li>Each answer is traceable to the template version and guidance shown at time of response.</li>
             <li>Evidence requests appear when the architecture implies they matter.</li>
             <li>Jurisdiction outcomes point to specific requirements and unanswered gaps.</li>
-            <li>Threat model and TAM links are captured in the workflow, not in a separate email chain.</li>
+            <li>Threat model and TAM links are captured in the workflow with the assessment record.</li>
           </ul>
         </article>
 
@@ -114,17 +114,17 @@ export function DashboardShell() {
               <h2>Source of truth posture</h2>
             </div>
             <Link href="/templates" className="action-link">
-              Open template registry
+              Open registry
             </Link>
           </div>
           <div className="governance-grid">
             <div className="governance-card">
               <span>Template key</span>
-              <strong>{sampleTemplate.templateKey}</strong>
+              <strong>{governedFallbackTemplate.templateKey}</strong>
             </div>
             <div className="governance-card">
               <span>Jurisdictions</span>
-              <strong>{sampleTemplate.jurisdictions.join(", ")}</strong>
+              <strong>{governedFallbackTemplate.jurisdictions.join(", ")}</strong>
             </div>
             <div className="governance-card">
               <span>Question source</span>

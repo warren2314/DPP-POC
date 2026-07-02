@@ -48,8 +48,8 @@ export function EvidencePanel({ evidenceLabels, threatModelUrl, tamDiagramUrl }:
         ) : (
           <li>This question has no explicit evidence requirement configured.</li>
         )}
-        <li>When the backend is wired, evidence metadata should track source, version, owner, and review date.</li>
-        <li>This panel should eventually drive conditional prompts when the architecture implies missing controls.</li>
+        <li>Evidence metadata should identify source, version, owner, and review date.</li>
+        <li>Conditional prompts highlight missing controls when the architecture implies additional review.</li>
       </ul>
       <a className="primary-button full-width" href="#assessment-details">
         Manage artifact links

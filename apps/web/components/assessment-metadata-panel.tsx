@@ -13,7 +13,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
   const canSync = Boolean(onJiraSync && metadata.jiraKey.trim());
 
   const syncLabel =
-    jiraSyncStatus === "syncing" ? "Syncing…" :
+    jiraSyncStatus === "syncing" ? "Syncing..." :
     jiraSyncStatus === "synced" ? "Synced" :
     jiraSyncStatus === "error" ? "Sync failed" :
     "Sync to Jira";
@@ -32,7 +32,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
           <input
             className="metadata-input"
             onChange={(event) => onChange("projectName", event.target.value)}
-            placeholder="Collections Portal"
+            placeholder="Enter product or initiative name"
             type="text"
             value={metadata.projectName}
           />
@@ -45,7 +45,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
             <input
               className="metadata-input"
               onChange={(event) => onChange("jiraKey", event.target.value)}
-              placeholder="WAR-123"
+              placeholder="PROJECT-123"
               type="text"
               value={metadata.jiraKey}
             />
@@ -60,7 +60,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
               </button>
             ) : null}
           </div>
-          <span className="metadata-help">Enter a ticket key (e.g. WAR-123) then sync to attach the assessment as a comment.</span>
+          <span className="metadata-help">Enter a ticket key, then sync to attach the assessment record.</span>
         </label>
 
         <label className="metadata-field">
@@ -68,7 +68,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
           <input
             className="metadata-input"
             onChange={(event) => onChange("threatModelUrl", event.target.value)}
-            placeholder="https://confluence.example.com/display/TM/042"
+            placeholder="Paste approved threat model URL"
             type="url"
             value={metadata.threatModelUrl}
           />
@@ -80,7 +80,7 @@ export function AssessmentMetadataPanel({ metadata, onChange, onJiraSync, jiraSy
           <input
             className="metadata-input"
             onChange={(event) => onChange("tamDiagramUrl", event.target.value)}
-            placeholder="https://confluence.example.com/display/TAM/123"
+            placeholder="Paste target architecture model URL"
             type="url"
             value={metadata.tamDiagramUrl}
           />

@@ -1,30 +1,30 @@
 import { AppShell } from "../../components/app-shell";
-import { sampleTemplate } from "../../lib/mock-data";
+import { governedFallbackTemplate } from "../../lib/mock-data";
 
 export default function TemplatesPage() {
   return (
     <AppShell
       eyebrow="Template Governance"
-      title="Published markdown template registry"
-      subtitle="Template management needs the same rigor as the assessments themselves: immutable versions, visible parsing outcomes, and explicit jurisdiction scope."
+      title="Published template registry"
+      subtitle="Manage the governed assessment source of truth with immutable versions, visible parsing outcomes, and explicit jurisdiction scope."
     >
       <section className="assessment-overview">
         <div className="overview-card emphasis">
           <span>Active template</span>
-          <strong>{sampleTemplate.title}</strong>
-          <p>{sampleTemplate.templateKey}</p>
+          <strong>{governedFallbackTemplate.title}</strong>
+          <p>{governedFallbackTemplate.templateKey}</p>
         </div>
         <div className="overview-card">
           <span>Version</span>
-          <strong>{sampleTemplate.version}</strong>
+          <strong>{governedFallbackTemplate.version}</strong>
         </div>
         <div className="overview-card">
           <span>Source type</span>
-          <strong>{sampleTemplate.sourceType}</strong>
+          <strong>{governedFallbackTemplate.sourceType}</strong>
         </div>
         <div className="overview-card">
           <span>Jurisdictions</span>
-          <strong>{sampleTemplate.jurisdictions.length}</strong>
+          <strong>{governedFallbackTemplate.jurisdictions.length}</strong>
         </div>
       </section>
 
@@ -33,26 +33,26 @@ export default function TemplatesPage() {
           <div className="panel-head">
             <div>
               <p className="section-kicker">Version snapshot</p>
-              <h2>{sampleTemplate.title}</h2>
+              <h2>{governedFallbackTemplate.title}</h2>
             </div>
-            <span className="tag strong">{sampleTemplate.version}</span>
+            <span className="tag strong">{governedFallbackTemplate.version}</span>
           </div>
           <div className="governance-grid compact">
             <div className="governance-card">
               <span>Template key</span>
-              <strong>{sampleTemplate.templateKey}</strong>
+              <strong>{governedFallbackTemplate.templateKey}</strong>
             </div>
             <div className="governance-card">
               <span>Jurisdictions</span>
-              <strong>{sampleTemplate.jurisdictions.join(", ")}</strong>
+              <strong>{governedFallbackTemplate.jurisdictions.join(", ")}</strong>
             </div>
             <div className="governance-card">
               <span>Sections</span>
-              <strong>{sampleTemplate.sections.length}</strong>
+              <strong>{governedFallbackTemplate.sections.length}</strong>
             </div>
             <div className="governance-card">
               <span>Questions</span>
-              <strong>{sampleTemplate.sections.reduce((sum, section) => sum + section.questions.length, 0)}</strong>
+              <strong>{governedFallbackTemplate.sections.reduce((sum, section) => sum + section.questions.length, 0)}</strong>
             </div>
           </div>
           <table className="report-table elevated">
@@ -64,7 +64,7 @@ export default function TemplatesPage() {
               </tr>
             </thead>
             <tbody>
-              {sampleTemplate.sections.map((section) => (
+              {governedFallbackTemplate.sections.map((section) => (
                 <tr key={section.key}>
                   <td>{section.title}</td>
                   <td>{section.questions.length}</td>

@@ -1,4 +1,5 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3001/api";
+const ASSESSMENT_CREATED_BY = process.env.NEXT_PUBLIC_ASSESSMENT_CREATED_BY ?? "sap-fioneer-workspace";
 
 export interface ApiAssessmentSummary {
   id: string;
@@ -23,7 +24,7 @@ export async function createAssessment(input: {
   const response = await fetch(`${API_BASE_URL}/assessments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...input, createdBy: "local-user" })
+    body: JSON.stringify({ ...input, createdBy: ASSESSMENT_CREATED_BY })
   });
 
   if (!response.ok) {
