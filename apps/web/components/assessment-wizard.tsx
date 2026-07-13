@@ -19,6 +19,7 @@ export function AssessmentWizard() {
   const [templateError, setTemplateError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, boolean | string | null>>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [metadata, setMetadata] = useState<LocalAssessmentMetadata>(defaultAssessmentMetadata);
   const [apiAssessmentId, setApiAssessmentId] = useState<string | null>(null);
   const [syncStatus, setSyncStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -52,6 +53,7 @@ export function AssessmentWizard() {
   const storageKey = `dpp-local-assessment-${activeTemplate.templateKey}-${activeTemplate.version}`;
   const metadataStorageKey = `${storageKey}-metadata`;
   const apiIdStorageKey = `${storageKey}-apiId`;
+  const notesStorageKey = `${storageKey}-notes`;
 
   const flatQuestions = activeTemplate.sections.flatMap((section, sectionIndex) =>
     section.questions.map((question, questionIndex) => ({
@@ -81,6 +83,21 @@ export function AssessmentWizard() {
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(answers));
   }, [answers, storageKey]);
+
+  useEffect(() => {
+    const savedValue = window.localStorage.getItem(notesStorageKey);
+    if (!savedValue) { setNotes({}); return; }
+    try {
+      setNotes(JSON.parse(savedValue) as Record<string, string>);
+    } catch {
+      window.localStorage.removeItem(notesStorageKey);
+      setNotes({});
+    }
+  }, [notesStorageKey]);
+
+  useEffect(() => {
+    window.localStorage.setItem(notesStorageKey, JSON.stringify(notes));
+  }, [notes, notesStorageKey]);
 
   useEffect(() => {
     const savedValue = window.localStorage.getItem(metadataStorageKey);
@@ -133,28 +150,47 @@ export function AssessmentWizard() {
     }
   }, [apiAssessmentId, apiIdStorageKey]);
 
+  const syncAnswer = useCallback(
+    async (key: string, value: boolean | string | null, comment: string) => {
+      setSyncStatus("saving");
+      const apiId = await ensureApiAssessmentId();
+      if (apiId) {
+        try {
+          await saveAnswerToApi(apiId, key, value, comment.trim() || undefined);
+          setSyncStatus("saved");
+          setTimeout(() => setSyncStatus("idle"), 2000);
+        } catch {
+          setSyncStatus("error");
+        }
+      } else {
+        setSyncStatus("idle");
+      }
+    },
+    [ensureApiAssessmentId]
+  );
+
   const updateAnswer = (value: boolean | string | null) => {
     if (!question) return;
     const key = question.stableKey;
     setAnswers((current) => ({ ...current, [key]: value }));
 
     if (value !== null) {
-      setSyncStatus("saving");
-      void (async () => {
-        const apiId = await ensureApiAssessmentId();
-        if (apiId) {
-          try {
-            await saveAnswerToApi(apiId, key, value);
-            setSyncStatus("saved");
-            setTimeout(() => setSyncStatus("idle"), 2000);
-          } catch {
-            setSyncStatus("error");
-          }
-        } else {
-          setSyncStatus("idle");
-        }
-      })();
+      void syncAnswer(key, value, notes[key] ?? "");
     }
+  };
+
+  const updateNote = (value: string) => {
+    if (!question) return;
+    setNotes((current) => ({ ...current, [question.stableKey]: value }));
+  };
+
+  const commitNote = () => {
+    if (!question) return;
+    const key = question.stableKey;
+    const noteValue = notes[key] ?? "";
+    const answerValue = answers[key] ?? null;
+    if (!noteValue.trim() && answerValue === null) return;
+    void syncAnswer(key, answerValue, noteValue);
   };
 
   const updateMetadata = (field: EditableAssessmentMetadataField, value: string) => {
@@ -180,11 +216,13 @@ export function AssessmentWizard() {
 
   const resetAnswers = () => {
     setAnswers({});
+    setNotes({});
     setMetadata(defaultAssessmentMetadata);
     setApiAssessmentId(null);
     setSyncStatus("idle");
     setJiraSyncStatus("idle");
     window.localStorage.removeItem(storageKey);
+    window.localStorage.removeItem(notesStorageKey);
     window.localStorage.removeItem(metadataStorageKey);
     window.localStorage.removeItem(apiIdStorageKey);
     setCurrentIndex(0);
@@ -350,7 +388,14 @@ export function AssessmentWizard() {
         </nav>
 
         <div className="wizard-main">
-          <QuestionCard question={question} value={answers[question.stableKey] ?? null} onChange={updateAnswer} />
+          <QuestionCard
+            question={question}
+            value={answers[question.stableKey] ?? null}
+            onChange={updateAnswer}
+            note={notes[question.stableKey] ?? ""}
+            onNoteChange={updateNote}
+            onNoteCommit={commitNote}
+          />
           <ComplianceSummary
             answeredQuestions={answeredQuestions}
             totalQuestions={flatQuestions.length}

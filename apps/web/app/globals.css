@@ -658,6 +658,18 @@ ul {
   background: var(--surface-muted);
 }
 
+.answer-note {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.note-input {
+  min-height: 88px;
+  resize: vertical;
+  font: inherit;
+}
+
 .question-footer {
   margin-top: 18px;
   padding-top: 16px;

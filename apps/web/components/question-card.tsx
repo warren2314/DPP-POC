@@ -6,9 +6,12 @@ interface QuestionCardProps {
   question: ParsedQuestion;
   value: AnswerValue;
   onChange: (value: AnswerValue) => void;
+  note: string;
+  onNoteChange: (note: string) => void;
+  onNoteCommit: () => void;
 }
 
-export function QuestionCard({ question, value, onChange }: QuestionCardProps) {
+export function QuestionCard({ question, value, onChange, note, onNoteChange, onNoteCommit }: QuestionCardProps) {
   const answerOptions =
     question.responseType === "boolean"
       ? [
@@ -71,6 +74,21 @@ export function QuestionCard({ question, value, onChange }: QuestionCardProps) {
                 ? "No"
                 : String(value).replaceAll("_", " ")}
         </span>
+      </div>
+
+      <div className="answer-note">
+        <label className="metadata-label" htmlFor={`note-${question.stableKey}`}>
+          Notes for this answer
+        </label>
+        <textarea
+          className="metadata-input note-input"
+          id={`note-${question.stableKey}`}
+          onBlur={onNoteCommit}
+          onChange={(event) => onNoteChange(event.target.value)}
+          placeholder="Add context, caveats, or follow-up detail for reviewers (optional)."
+          rows={3}
+          value={note}
+        />
       </div>
 
       {question.guidance?.prompts?.length ? (
