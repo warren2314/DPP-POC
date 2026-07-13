@@ -37,12 +37,13 @@ export async function createAssessment(input: {
 export async function saveAnswerToApi(
   assessmentId: string,
   questionKey: string,
-  value: boolean | string | null
+  value: boolean | string | null,
+  comment?: string
 ): Promise<void> {
   await fetch(`${API_BASE_URL}/assessments/${assessmentId}/answers/${questionKey}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ value })
+    body: JSON.stringify({ value, comment })
   });
 }
 
